@@ -11,18 +11,7 @@ class colors(Enum):
 max_cube_count = {colors.RED: 12, colors.GREEN: 13, colors.BLUE: 14}
 
 
-def check_valid_game(game: str) -> bool:
-    rounds = game.split("; ")
-    for round in rounds:
-        colored_cubes = round.split(", ")
-        for cubes in colored_cubes:
-            amount, color = cubes.split(" ")
-            if int(amount) > max_cube_count[colors(color)]:
-                return False
-    return True
-
-
-def get_cube_power(game: str) -> int:
+def get_min_cube_count(game: str) -> dict[colors, int]:
     min_cube_count = {color: 0 for color in colors}
     rounds = game.split("; ")
     for round in rounds:
@@ -32,6 +21,19 @@ def get_cube_power(game: str) -> int:
             min_cube_count[colors(color)] = max(
                 min_cube_count[colors(color)], int(amount)
             )
+    return min_cube_count
+
+
+def check_valid_game(game: str) -> bool:
+    min_cube_count = get_min_cube_count(game)
+    for color in min_cube_count:
+        if min_cube_count[color] > max_cube_count[color]:
+            return False
+    return True
+
+
+def get_cube_power(game: str) -> int:
+    min_cube_count = get_min_cube_count(game)
     return prod(values for values in min_cube_count.values())
 
 
